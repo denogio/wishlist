@@ -129,7 +129,14 @@
         "show-for-list-owner": "Показать для владельца списка",
         "show-for-list-owner-description": "Разрешить владельцам списков просматривать брони в их собственных списках.",
         "show-name-across-groups-tooltip": "Показывает имя пользователя, забронировавшего пункт, даже если пользователь не входит в Вашу группу.",
-        "show-name-across-groups": "Показать имя во всех группах"
+        "show-name-across-groups": "Показать имя во всех группах",
+        "ignore-cert-check": "Игнорировать ошибки сертификатов",
+        "oidc-claim-name-description": "Требование использовать для установки имя пользователей.",
+        "oidc-claim-username-description": "Требование использовать для установки никнейм пользователей.",
+        "sending": "Отправка",
+        "smtp-ignore-cert-check-description": "Не проверять сертификат TLS. В основном используется для локальных подключений. Не рекомендуется.",
+        "smtp-use-tls": "Использовать TLS",
+        "smtp-use-tls-description": "Подключиться к SMTP-серверу напрямую с использованием TLS, а не STARTTLS. Наиболее часто используется с портом 465."
     },
     "auth": {
         "update-password": "Обновить пароль",
@@ -196,7 +203,6 @@
         "cannot-edit-item-that-you-did-not-create": "Невозможно редактировать элемент, который вы не создавали",
         "cant-find-your-group": "Не могу найти вашу группу!",
         "group-is-already-active": "Группа с таким именем уже существует",
-        "invalid-currency-code": "Код валюты недействителен. Список действительных кодов валют можно найти <a href=\"https://en.wikipedia.org/wiki/ISO_4217#Active_codes_(list_one)\" target=\"_blank\" rel=\"noopener noreferrer\">здесь</a>",
         "invite-code-invalid": "Пригласительный код недействителен или уже использован",
         "invite-failed-to-send": "Не удалось отправить приглашение: {errorMessage}",
         "item-id-must-be-a-number": "Идентификатор элемента должен быть числом",
@@ -210,7 +216,6 @@
         "not-authorized": "Не авторизовано",
         "one-or-more-items-missing-an-id": "У одного или нескольких элементов отсутствует идентификатор",
         "password-min-strength": "Пароль должен удовлетворять требованиям не ниже ''{minStrength}''",
-        "price-must-have-a-currency": "Цена должна иметь валюту",
         "product-information-not-available": "Информация о продукте недоступна",
         "public-list-not-found": "Публичный список не найден",
         "reset-token-not-found": "Токен сброса не найден",

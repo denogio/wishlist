@@ -24,7 +24,8 @@
         "default-item-image": "standardbild för artikel",
         "remove-manager-name": "Ta bort {name}",
         "unpurchase": "Markera artikel som inte köpt",
-        "user-menu": "Användarmeny"
+        "user-menu": "Användarmeny",
+        "claimed-progress": "Reservationsframsteg"
     },
     "admin": {
         "dev": "dev",
@@ -136,7 +137,12 @@
         "sending": "Skickar",
         "smtp-ignore-cert-check-description": "Validera inte TLS-certifikatet. Används oftast för lokala anslutningar. Rekommenderas inte.",
         "smtp-use-tls": "Använd TLS",
-        "smtp-use-tls-description": "Anslut direkt till SMTP-servern med TLS istället för att använda STARTTLS. Vanligtvis används port 465."
+        "smtp-use-tls-description": "Anslut direkt till SMTP-servern med TLS istället för att använda STARTTLS. Vanligtvis används port 465.",
+        "clear-sessions": "Rensa användarsessioner",
+        "clear-sessions-confirmation": "Är du säker på att du vill rensa den här användarens sessioner? Användaren kommer att loggas ut från alla enheter och måste logga in igen.",
+        "show-name-publicly": "Visa namn publikt",
+        "show-name-publicly-tooltip": "När det är aktiverat visas namnet som anges i ett offentligt anspråk för alla som tittar på den offentliga listan.",
+        "oidc-url-description": "URL:en till din OAuth-leverantör eller URL:en till den specifika domänen (realm) eller applikationen hos leverantören. Detta kallas ofta även för en discovery-URL."
     },
     "app": {
         "my-claims": "Mina reservationer",
@@ -263,7 +269,12 @@
         "oidc-error": "Misslyckades med autentisering med OAuth",
         "unable-to-update-preferred-language": "Det gick inte att uppdatera önskat språk",
         "email-is-required-for-public-claims": "E-postadress krävs för publika anspråk",
-        "display-order-invalid": "Visningsordningen måste vara mellan {min} och {max}"
+        "display-order-invalid": "Visningsordningen måste vara mellan {min} och {max}",
+        "no-claim-on-behalf-of": "Kan inte göra anspråk på ett objekt å en annan användares vägnar",
+        "this-list-is-not-part-of-your-active-group": "Den här listan ingår inte i din aktiva grupp",
+        "invalid-asset-path": "Ogiltig sökväg till tillgång",
+        "self-claims-not-available": "Det går inte att tillåta att användare gör anspråk på objekt när dessa anspråk inte syns för ägarna i deras egna listor",
+        "this-list-does-not-allow-self-claimed-items": "Denna lista tillåter inte anspråk på egna artiklar."
     },
     "general": {
         "enable": "Aktivera",
@@ -441,7 +452,7 @@
         "display-order": "Visningsordning",
         "enter-the-quantity-to-claim": "Ange den kvantitet som ska reserveras.",
         "hide-all-currencies": "dölj alla valutor...",
-        "hide-claims": "Dölj reservationer",
+        "hide-claims": "Dölj detaljer",
         "hide-description": "Dölj beskrivning",
         "import-error-text": "Wishlist kunde inte fastställa produktadressen från de angivna parametrarna. Du kan fortfarande kopiera produktadressen manuellt och lägga till artikeln med den vanliga processen.",
         "import-error-title": "Det gick inte att importera artikeln",
@@ -467,11 +478,26 @@
         "quantity-claimed": "{quantity} reserverad",
         "quantity-desired": "{quantity} önskad",
         "show-all-currencies": "visa alla valutor...",
-        "show-claims": "Visa reservationer",
+        "show-claims": "Visa detaljer",
         "show-description": "Visa beskrivning",
         "sort-by": "Sortera efter",
         "supports-markdown": "Stöder Markdown",
-        "item-created": "Artikel skapad"
+        "item-created": "Artikel skapad",
+        "hide-owner": "Dölj ägare",
+        "items-claimed": "{claimedCount} av {itemCount} reserverad",
+        "items-available": "{availableCount, plural, one {# Tillgänglig} other {# Tillgängliga}}",
+        "items-requested": "{itemCount, plural, one {# begärd} other {# begärda}}",
+        "claim-item": "Reservera artikel",
+        "claimed-info-text-for-name": "{claimedQuantity, plural, one {{name} har reserverat # artikel.} other {{name} har reserverat # artiklar.}}",
+        "edit-claim": "Redigera reservation",
+        "update-claim-for-name": "Uppdatera reservation för {name}",
+        "list-allow-self-claims": "Tillåt ägaren att göra anspråk på föremål",
+        "list-allow-self-claims-description": "Tillåter listägaren att göra anspråk på artiklar i listan.",
+        "list-allow-self-claims-description-helper-text": "Det går inte att aktivera den här inställningen om inte anspråk är synliga för listägare (gruppinställning).",
+        "list-hide-owner-description": "Döljer ägaren på listkortet.",
+        "list-not-for-me": "Den här listan är till någon annan",
+        "list-not-for-me-description": "Om du hanterar den här listan åt någon annan gör den här inställningen att listägaren kan se anspråk och enskilda anspråksposter på listan.",
+        "public-list-option-description": "Gör det möjligt för andra att se listan och göra anspråk på artiklar från den."
     },
     "unable-to-load-icons": "Det gick inte att ladda ikoner."
 }

@@ -10,8 +10,22 @@
     import Tooltip from "../Tooltip.svelte";
     import ConfirmModal from "../modals/ConfirmModal.svelte";
     import SelectListManagerModal from "../modals/SelectListManagerModal.svelte";
+    import Checkbox from "../Checkbox.svelte";
 
-    interface ListProps extends Partial<Pick<List, "id" | "icon" | "iconColor" | "name" | "public" | "description">> {
+    interface ListProps extends Partial<
+        Pick<
+            List,
+            | "id"
+            | "icon"
+            | "iconColor"
+            | "name"
+            | "public"
+            | "description"
+            | "hideOwner"
+            | "allowSelfClaims"
+            | "notForMe"
+        >
+    > {
         owner: Pick<User, "id" | "name" | "username" | "picture">;
         managers: Pick<User, "id" | "name" | "username">[];
     }
@@ -21,15 +35,25 @@
         persistButtonName: string;
         listMode: ListMode;
         allowsPublicLists: boolean;
+        claimsVisibleToOwner: boolean;
         groupId: string;
         editing?: boolean;
     }
 
-    const { list: list_, persistButtonName, listMode, allowsPublicLists, groupId, editing = false }: Props = $props();
+    const {
+        list: list_,
+        persistButtonName,
+        listMode,
+        allowsPublicLists,
+        claimsVisibleToOwner,
+        groupId,
+        editing = false
+    }: Props = $props();
     const t = getFormatter();
     const formId: string = $props.id();
 
-    let list = $derived(list_);
+    // svelte-ignore state_referenced_locally
+    let list = $state(list_);
     let colorElement: Element | undefined = $state();
     let defaultColor: string = $derived(
         colorElement ? getComputedStyle(colorElement).backgroundColor : list.iconColor || ""
@@ -73,20 +97,6 @@
                     bind:value={list.name}
                 />
             </label>
-
-            {#if allowsPublicLists || listMode === "registry"}
-                <label class="unstyled mt-8 flex flex-row items-center gap-x-2" for="public">
-                    <input
-                        id="public"
-                        name="public"
-                        class="checkbox"
-                        checked={list.public || listMode === "registry"}
-                        disabled={listMode === "registry"}
-                        type="checkbox"
-                    />
-                    <span>{$t("wishes.public")}</span>
-                </label>
-            {/if}
         </div>
 
         <label class="label col-span-full flex flex-col md:col-span-4" for="iconColor">
@@ -117,6 +127,59 @@
         </label>
         <div class="col-span-full md:col-span-8">
             <IconSelector id="icon" icon={list.icon} onIconSelected={(icon) => (list.icon = icon)} />
+        </div>
+
+        {#if allowsPublicLists || listMode === "registry"}
+            <div class="col-span-full">
+                <Checkbox
+                    name="public"
+                    checked={list.public || listMode === "registry"}
+                    disabled={listMode === "registry"}
+                >
+                    <span>{$t("wishes.public")}</span>
+                    {#snippet description()}
+                        {$t("wishes.public-list-option-description")}
+                    {/snippet}
+                </Checkbox>
+            </div>
+        {/if}
+
+        <div class="col-span-full">
+            <Checkbox name="hideOwner" bind:checked={list.hideOwner}>
+                <span>{$t("wishes.hide-owner")}</span>
+                {#snippet description()}
+                    {$t("wishes.list-hide-owner-description")}
+                {/snippet}
+            </Checkbox>
+        </div>
+
+        <div class="col-span-full">
+            <Checkbox name="notForMe" bind:checked={list.notForMe}>
+                <span>{$t("wishes.list-not-for-me")}</span>
+                {#snippet description()}
+                    <span>
+                        {$t("wishes.list-not-for-me-description")}
+                    </span>
+                {/snippet}
+            </Checkbox>
+        </div>
+
+        <div class="col-span-full">
+            <Checkbox
+                name="allowSelfClaims"
+                disabled={!claimsVisibleToOwner || list.notForMe}
+                bind:checked={list.allowSelfClaims}
+            >
+                <span>{$t("wishes.list-allow-self-claims")}</span>
+                {#snippet description()}
+                    <span>{$t("wishes.list-allow-self-claims-description")}</span>
+                    {#if !claimsVisibleToOwner}
+                        <span class="text-invalid italic">
+                            {$t("wishes.list-allow-self-claims-description-helper-text")}
+                        </span>
+                    {/if}
+                {/snippet}
+            </Checkbox>
         </div>
 
         <div class="col-span-full">

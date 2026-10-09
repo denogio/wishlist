@@ -9,10 +9,16 @@ import { getItemInclusions } from "$lib/server/items";
 import { ItemEvent } from "$lib/events";
 import { logger } from "$lib/server/logger";
 import z from "zod";
+import { getActiveMembership } from "$lib/server/group-membership";
 
 // Claim an item on a list
 export const PUT: RequestHandler = async ({ locals, request, params }) => {
     const $t = await getFormatter();
+
+    const itemId = parseInt(params.itemId);
+    if (isNaN(itemId)) {
+        error(400, $t("errors.item-id-must-be-a-number"));
+    }
 
     const body = (await request.json()) as Record<string, unknown>[];
     const updateData = listItemClaimSchema.safeParse(body);
@@ -27,7 +33,11 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
     const list = await client.list.findUnique({
         select: {
             id: true,
-            public: true
+            public: true,
+            groupId: true,
+            allowSelfClaims: true,
+            notForMe: true,
+            ownerId: true
         },
         where: {
             id: params.listId
@@ -39,14 +49,19 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
     }
 
     if (updateData.data.claimedById !== undefined && updateData.data.claimedById !== null) {
-        if (!locals.user) error(401, $t("errors.unauthenticated"));
+        if (!locals.user) {
+            error(401, $t("errors.unauthenticated"));
+        } else if (locals.user.id !== updateData.data.claimedById) {
+            error(403, $t("errors.no-claim-on-behalf-of"));
+        }
     }
     if (updateData.data.publicClaimedById && !list.public) {
         error(404, $t("errors.list-not-found"));
     }
 
-    if (isNaN(parseInt(params.itemId))) {
-        error(400, $t("errors.item-id-must-be-a-number"));
+    const isSelfClaimable = list.allowSelfClaims || list.notForMe;
+    if (updateData.data.claimedById === list.ownerId && !isSelfClaimable) {
+        error(400, $t("errors.this-list-does-not-allow-self-claimed-items"));
     }
 
     const item = await client.item.findUnique({
@@ -60,7 +75,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
             }
         },
         where: {
-            id: parseInt(params.itemId),
+            id: itemId,
             lists: {
                 some: {
                     listId: list.id
@@ -71,6 +86,13 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 
     if (!item) {
         error(404, $t("errors.item-not-found-on-list"));
+    }
+
+    if (locals.user) {
+        const activeGroupId = (await getActiveMembership(locals.user)).groupId;
+        if (activeGroupId !== list.groupId) {
+            error(403, $t("errors.this-list-is-not-part-of-your-active-group"));
+        }
     }
 
     const claimedQuantity = item.claims.reduce((a, { quantity }) => a + quantity, 0);
@@ -123,6 +145,6 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
         return new Response(null, { status: 200 });
     } catch (err) {
         logger.error({ err }, "Error claiming item");
-        error(404, $t("errors.item-not-found"));
+        error(422, $t("general.oops"));
     }
 };

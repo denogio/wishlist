@@ -11,6 +11,7 @@
         userCanManage?: boolean;
         showClaimedName: boolean;
         showNameAcrossGroups?: boolean;
+        showPublicClaimName?: boolean;
         showClaimForOwner?: boolean;
         requireClaimEmail: boolean;
         groupId: string;
@@ -21,6 +22,7 @@
         onDecreasePriority?: ItemVoidFunction;
         onPriorityChange?: (item: ItemOnListDTO, idx: string) => void;
         isTileView?: boolean;
+        isSelfClaimable?: boolean;
     }
 
     export interface InternalItemCardProps {
@@ -31,6 +33,7 @@
         showClaimedName: boolean;
         showNameAcrossGroups: boolean;
         showClaimForOwner: boolean;
+        showPublicClaimName: boolean;
         requireClaimEmail: boolean;
         groupId: string;
         showFor: boolean;
@@ -40,13 +43,13 @@
         onDecreasePriority?: ItemVoidFunction;
         onPriorityChange?: (item: ItemOnListDTO, idx: string) => void;
         defaultImage: Snippet<[MessageFormatter, classes?: ClassValue]>;
+        isSelfClaimable: boolean;
     }
 </script>
 
 <script lang="ts">
     import type { User } from "$lib/generated/prisma/client";
     import { goto } from "$app/navigation";
-    import { page } from "$app/state";
     import type { ItemOnListDTO } from "$lib/dtos/item-dto";
     import type { ClassValue } from "svelte/elements";
     import type { MessageFormatter } from "$lib/server/i18n";
@@ -63,6 +66,7 @@
         showClaimedName = false,
         showNameAcrossGroups = false,
         showClaimForOwner = false,
+        showPublicClaimName = false,
         requireClaimEmail = true,
         showFor = false,
         onPublicList = false,
@@ -70,25 +74,14 @@
         onIncreasePriority = undefined,
         onDecreasePriority = undefined,
         onPriorityChange,
-        isTileView = false
+        isTileView = false,
+        isSelfClaimable = false
     }: ItemCardProps = $props();
 
     const id = $props.id();
 
-    let drawerOpen = $state(false);
-
-    $effect(() => {
-        if (page.url.searchParams.get("item-id") === item.id.toString()) {
-            openDrawer();
-        }
-    });
-
     function launchDrawer() {
         goto(`?item-id=${item.id}`, { replaceState: true, noScroll: true });
-    }
-
-    function openDrawer() {
-        drawerOpen = true;
     }
 
     const ItemCard = $derived(isTileView ? GridItemCard : ListItemCard);
@@ -109,6 +102,7 @@
     {id}
     {defaultImage}
     {groupId}
+    {isSelfClaimable}
     {item}
     {onDecreasePriority}
     {onIncreasePriority}
@@ -120,15 +114,15 @@
     {showClaimedName}
     {showFor}
     {showNameAcrossGroups}
+    {showPublicClaimName}
     {user}
     {userCanManage}
-    bind:open={drawerOpen}
 />
 
 <div
     class={[
-        "card preset-filled-surface-100-900 inset-ring-surface-200-800 block h-full w-full text-start inset-ring print:break-inside-avoid print:shadow-none",
-        !item.approved && "preset-tonal-warning inset-ring-warning-500 inset-ring",
+        "card preset-filled-surface-100-900 border-surface-200-800 block h-full w-full border text-start print:break-inside-avoid print:shadow-none",
+        !item.approved && "preset-tonal-warning border-warning-500 border",
         !reorderActions && "card-hover"
     ]}
     aria-labelledby={`${id}-name`}
@@ -144,6 +138,7 @@
         {id}
         {defaultImage}
         {groupId}
+        {isSelfClaimable}
         {item}
         {onDecreasePriority}
         {onIncreasePriority}
@@ -155,6 +150,7 @@
         {showClaimedName}
         {showFor}
         {showNameAcrossGroups}
+        {showPublicClaimName}
         {user}
         {userCanManage}
     />

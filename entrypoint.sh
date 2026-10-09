@@ -10,4 +10,5 @@ pnpm prisma migrate deploy && \
 pnpm prisma db seed && \
 pnpm db:patch
 
-exec pnpm start
+# Start Node directly: no package-manager process retained in RAM.
+exec node build

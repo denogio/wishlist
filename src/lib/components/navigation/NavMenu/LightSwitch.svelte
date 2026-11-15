@@ -30,7 +30,8 @@
 
     $effect(() => {
         if (props.disabled) return;
-        value = modeLocalStorage.current;
+        const saved = modeLocalStorage.current;
+        value = options.some((option) => option.value === saved) ? saved : "system";
         if (value === "system") {
             const pref = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
             setPreference(pref);
@@ -40,11 +41,14 @@
     });
 
     onMount(() => {
-        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-            if (value === "system") {
+        const media = window.matchMedia("(prefers-color-scheme: dark)");
+        const onchange = (e: MediaQueryListEvent) => {
+            if (!props.disabled && value === "system") {
                 setPreference(e.matches ? "dark" : "light");
             }
-        });
+        };
+        media.addEventListener("change", onchange);
+        return () => media.removeEventListener("change", onchange);
     });
 
     const onValueChange: SegmentedControlRootProps["onValueChange"] = (details) => {
@@ -67,26 +71,3 @@
         {/each}
     </SegmentedControl.Control>
 </SegmentedControl>
-
-<svelte:head>
-    <script>
-        (function initMode() {
-            var theme =
-                typeof localStorage !== "undefined"
-                    ? JSON.parse(localStorage.getItem("theme")) || "wishlist"
-                    : "wishlist";
-            if (theme !== "wishlist") {
-                document.documentElement.setAttribute("data-mode", "dark");
-                return;
-            }
-            var mode =
-                typeof localStorage !== "undefined" ? JSON.parse(localStorage.getItem("mode")) || "system" : "system";
-            if (mode === "system") {
-                var pref = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-                document.documentElement.setAttribute("data-mode", pref);
-            } else {
-                document.documentElement.setAttribute("data-mode", mode);
-            }
-        })();
-    </script>
-</svelte:head>

@@ -17,7 +17,9 @@
 
     let IconifyIcon: IconifyIconHTMLElement | undefined;
     let availableIcons: string[] = $state([]);
-    let iconValue = $state(icon);
+    let targets = $derived(fuzzysort.snapshot(availableIcons));
+
+    let iconValue = $state(icon || undefined);
     let search = $state("");
 
     onMount(() => {
@@ -75,7 +77,7 @@
             onIconSelected?.(iconValue);
         }
         search = event.inputValue;
-        filteredIcons = fuzzysort.go(event.inputValue, availableIcons, { all: true }).map((result) => result.target);
+        filteredIcons = fuzzysort.go(event.inputValue, targets, { limit: 0 }).map((result) => result.target);
         if (filteredIcons.find((i) => i === search)) {
             iconValue = search;
         }
@@ -86,6 +88,7 @@
     name={id || "name"}
     class="w-full gap-0"
     {collection}
+    defaultInputValue={iconValue}
     inputBehavior="autohighlight"
     {onInputValueChange}
     {onOpenChange}

@@ -10,8 +10,6 @@
 
     const t = getFormatter();
 
-    const DARK_ONLY_THEMES = ["catppuccin-mocha", "tokyo-night", "everforest", "gruvbox", "rose-pine"];
-
     const options = [
         { value: "wishlist", label: $t("general.default") },
         { value: "catppuccin-mocha", label: "Catppuccin Mocha" },
@@ -27,14 +25,15 @@
 
     const setTheme = (theme: string) => {
         document.documentElement.setAttribute("data-theme", theme);
-        isDarkOnly = DARK_ONLY_THEMES.includes(theme);
+        isDarkOnly = theme !== "wishlist";
         if (isDarkOnly) {
             document.documentElement.setAttribute("data-mode", "dark");
         }
     };
 
     $effect(() => {
-        value = themeLocalStorage.current;
+        const saved = themeLocalStorage.current;
+        value = options.some((option) => option.value === saved) ? saved : "wishlist";
         setTheme(value);
     });
 
@@ -55,18 +54,3 @@
         {/each}
     </select>
 </div>
-
-<svelte:head>
-    <script>
-        (function initTheme() {
-            var theme =
-                typeof localStorage !== "undefined"
-                    ? JSON.parse(localStorage.getItem("theme")) || "wishlist"
-                    : "wishlist";
-            document.documentElement.setAttribute("data-theme", theme);
-            if (theme !== "wishlist") {
-                document.documentElement.setAttribute("data-mode", "dark");
-            }
-        })();
-    </script>
-</svelte:head>

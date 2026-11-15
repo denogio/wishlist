@@ -8,5 +8,7 @@ caddy start --config /usr/src/app/Caddyfile
 
 pnpm prisma migrate deploy && \
 pnpm prisma db seed && \
-pnpm db:patch && \
-pnpm start
+pnpm db:patch
+
+# Start Node directly: no package-manager process retained in RAM.
+exec node build

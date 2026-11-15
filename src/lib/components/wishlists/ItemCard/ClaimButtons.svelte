@@ -6,17 +6,21 @@
     import { ClaimAPI } from "$lib/api/claims";
     import { toaster } from "$lib/components/toaster";
 
-    type Props = Pick<
+    interface Props extends Pick<
         InternalItemCardProps,
         | "item"
         | "user"
         | "showClaimedName"
         | "showNameAcrossGroups"
         | "showClaimForOwner"
+        | "showPublicClaimName"
         | "onPublicList"
         | "groupId"
         | "requireClaimEmail"
-    >;
+        | "isSelfClaimable"
+    > {
+        isClaimableOrClaimed: (ans: boolean) => void;
+    }
 
     let {
         item,
@@ -24,15 +28,20 @@
         showClaimedName = false,
         showNameAcrossGroups = false,
         showClaimForOwner = false,
+        showPublicClaimName = false,
         onPublicList = false,
         groupId,
-        requireClaimEmail
+        requireClaimEmail,
+        isClaimableOrClaimed,
+        isSelfClaimable
     }: Props = $props();
 
     const t = getFormatter();
 
-    const userClaim = $derived(item.claims.find((claim) => claim.claimedBy && claim.claimedBy.id === user?.id));
-    const isClaimOnList = $derived(userClaim?.listId === item.listId);
+    let userClaim = $derived(item.claims.find((claim) => claim.claimedBy && claim.claimedBy.id === user?.id));
+    let isClaimOnList = $derived(userClaim?.listId === item.listId);
+
+    $effect(() => isClaimableOrClaimed(item.isClaimable || (userClaim && isClaimOnList) || false));
 
     const handlePurchased = async (purchased: boolean) => {
         if (userClaim && isClaimOnList) {
@@ -51,7 +60,7 @@
 {:else if userClaim}
     {#if isClaimOnList}
         <div class="flex flex-row items-center gap-2">
-            <ClaimItemModal claimId={userClaim.claimId} {groupId} {item} {requireClaimEmail} userId={user?.id}>
+            <ClaimItemModal claimId={userClaim?.claimId} {groupId} {item} {requireClaimEmail} userId={user?.id}>
                 {#snippet trigger(props)}
                     <button
                         {...props}
@@ -80,9 +89,9 @@
             </button>
         </div>
     {:else}
-        <span class="text-subtle text-wrap">{$t("wishes.claimed-by-you-on-another-list")}</span>
+        <span class="text-subtle line-clamp-2 truncate text-wrap">{$t("wishes.claimed-by-you-on-another-list")}</span>
     {/if}
-{:else if item.isClaimable && item.userId !== user?.id}
+{:else if item.isClaimable && (item.userId !== user?.id || isSelfClaimable)}
     <div class="flex flex-row items-center gap-x-2">
         <ClaimItemModal {groupId} {item} {requireClaimEmail} userId={user?.id}>
             {#snippet trigger(props)}
@@ -94,7 +103,7 @@
     </div>
 {:else if item.claims.length === 0 || (item.userId === user?.id && item.isClaimable)}
     <div></div>
-{:else if item.claims.length === 1 && shouldShowName(item, showClaimedName, showNameAcrossGroups, showClaimForOwner, user, item.claims[0])}
+{:else if item.claims.length === 1 && shouldShowName(item, showClaimedName, showNameAcrossGroups, showClaimForOwner, showPublicClaimName, user, item.claims[0])}
     <span class="text-subtle line-clamp-2 truncate text-wrap">
         {$t("wishes.claimed-by", {
             values: {
@@ -102,7 +111,7 @@
             }
         })}
     </span>
-{:else if item.claims.length > 1 && shouldShowName(item, showClaimedName, showNameAcrossGroups, showClaimForOwner, user)}
+{:else if item.claims.length > 1 && shouldShowName(item, showClaimedName, showNameAcrossGroups, showClaimForOwner, showPublicClaimName, user)}
     <span class="text-subtle line-clamp-2 truncate text-wrap">{$t("wishes.claimed-by-multiple-users")}</span>
 {:else}
     <span class="text-subtle line-clamp-2 truncate text-wrap">{$t("wishes.claimed")}</span>

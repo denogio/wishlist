@@ -3,6 +3,7 @@ import { EditItemPage } from "../pageObjects/edit-item.page";
 import { Modal } from "./modal";
 import { Toast } from "./toast";
 import { DeleteItemModal } from "./delete-item-modal";
+import { ClaimItemModal } from "./claim-item-modal";
 
 export class ItemCard {
     private readonly card: Locator;
@@ -18,6 +19,8 @@ export class ItemCard {
     private readonly deleteButton: Locator;
     private readonly approveButton: Locator;
     private readonly denyButton: Locator;
+    private readonly claimButton: Locator;
+    private readonly unclaimButton: Locator;
 
     constructor(card: Locator) {
         this.card = card;
@@ -33,6 +36,8 @@ export class ItemCard {
         this.deleteButton = card.getByRole("button", { name: "Delete" });
         this.approveButton = card.getByRole("button", { name: "Approve" });
         this.denyButton = card.getByRole("button", { name: "Deny" });
+        this.claimButton = card.getByRole("button", { name: "Claim", exact: true });
+        this.unclaimButton = card.getByRole("button", { name: "Unclaim", exact: true });
     }
 
     async assertDefaultImage() {
@@ -107,6 +112,31 @@ export class ItemCard {
 
     async assertDeleteButtonHidden() {
         await expect(this.deleteButton).not.toBeVisible();
+        return this;
+    }
+
+    async assertNoClaimButton() {
+        await expect(this.claimButton).not.toBeVisible();
+    }
+
+    async claimSingle() {
+        await this.claimButton.click();
+        await new Toast(this.card.page()).waitForToastWithText("Claimed item");
+    }
+
+    async unclaimSingle() {
+        await this.unclaimButton.click();
+        await new Toast(this.card.page()).waitForToastWithText("Unclaimed item");
+    }
+
+    async claimAmount(quantity: number) {
+        await this.claimButton.click();
+        const modal = new ClaimItemModal(this.card.page());
+        await modal
+            .visible()
+            .then((m) => m.setQuantity(quantity))
+            .then((m) => m.submit());
+        await new Toast(this.card.page()).waitForToastWithText("Claimed item");
         return this;
     }
 

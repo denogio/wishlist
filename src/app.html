@@ -3,6 +3,34 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width" />
+        <script>
+            // Apply preferences before CSS/hydration, even with the user menu closed.
+            (function () {
+                function read(key, fallback) {
+                    try {
+                        return JSON.parse(localStorage.getItem(key)) || fallback;
+                    } catch {
+                        return fallback;
+                    }
+                }
+                var themes = ["wishlist", "catppuccin-mocha", "tokyo-night", "everforest", "gruvbox", "rose-pine"];
+                var theme = read("theme", "wishlist");
+                if (!themes.includes(theme)) theme = "wishlist";
+                var mode = read("mode", "system");
+                if (!["system", "light", "dark"].includes(mode)) mode = "system";
+                document.documentElement.setAttribute("data-theme", theme);
+                document.documentElement.setAttribute(
+                    "data-mode",
+                    theme !== "wishlist"
+                        ? "dark"
+                        : mode === "system"
+                          ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                              ? "dark"
+                              : "light"
+                          : mode
+                );
+            })();
+        </script>
         <script src="https://code.iconify.design/iconify-icon/2.2.0/iconify-icon.min.js"></script>
         <link rel="apple-touch-icon" sizes="180x180" href="%sveltekit.assets%/apple-touch-icon.png?v=2" />
         <link rel="icon" type="image/png" sizes="32x32" href="%sveltekit.assets%/favicon-32x32.png?v=2" />
